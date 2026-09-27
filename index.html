@@ -1,49 +1,217 @@
-<!DOCTYPEhtml>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Dooley's Corner</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dooley's Booru</title>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: #202020;
-            color: white;
+            background-color: #1b1b1b;
+            color: #dcdcdc;
             font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 80px;
+            font-size: 14px;
         }
 
-        h1 {
-            font-size: 50px;
+        /* Top Header */
+        header {
+            background-color: #282828;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #00adb5;
+        }
+        header h1 { color: #00adb5; font-size: 22px; }
+        .search-bar { display: flex; gap: 8px; }
+        .search-bar input {
+            padding: 6px 12px;
+            background: #111;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+            width: 250px;
         }
 
-        p {
-            font-size: 20px;
-        }
+        /* Main Booru Layout */
+        .container { display: flex; padding: 20px; gap: 20px; }
 
-        button {
-            padding: 12px 25px;
-            font-size: 18px;
-            cursor: pointer;
-            background-color: #ffffff;
-            color: #202020;
-            border: none;
+        /* Left Sidebar - Tags & Admin Controls */
+        .sidebar {
+            width: 240px;
+            background-color: #222;
+            padding: 15px;
             border-radius: 6px;
-            transition: transform 0.2s, background-color 0.2s;
+            border: 1px solid #333;
+            flex-shrink: 0;
+        }
+        .sidebar h3 {
+            color: #00adb5;
+            font-size: 14px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 4px;
+        }
+        .tag-list { list-style: none; margin-bottom: 20px; }
+        .tag-list li { margin-bottom: 6px; display: flex; justify-content: space-between; }
+        .tag-list a { color: #88c0d0; text-decoration: none; }
+        .tag-list a:hover { text-decoration: underline; }
+        .tag-count { color: #777; font-size: 12px; }
+
+        /* Admin Box */
+        .admin-panel {
+            background: #181818;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px dashed #00adb5;
+        }
+        .admin-badge {
+            display: inline-block;
+            background: #00adb5;
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+            font-weight: bold;
         }
 
-        button:hover {
-            background-color: #00adb5;
+        /* Buttons */
+        .btn {
+            background: #00adb5;
             color: white;
-            transform: scale(1.05);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 6px;
+        }
+        .btn:hover { background: #008c93; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+
+        /* Gallery Grid */
+        .gallery {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .post-card {
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .post-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .post-info { margin-top: 8px; font-size: 12px; color: #aaa; }
+        
+        /* Admin Delete Overlay (Hidden by default) */
+        .admin-actions {
+            display: none;
+            margin-top: 8px;
         }
     </style>
 </head>
-
 <body>
-    <h1>Welcome to Dooley's Corner</h1>
 
-    <p>This website was made entirely on my Chromebook.</p>
+    <header>
+        <h1>Dooley's Corner Booru</h1>
+        <div class="search-bar">
+            <input type="text" placeholder="Search tags (e.g. chromebook, code)...">
+            <button class="btn" style="width: auto;" onclick="alert('Search feature coming soon!')">Search</button>
+        </div>
+    </header>
 
-    <button onclick="alert('You found the button!')">Don't click this</button>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>Popular Tags</h3>
+            <ul class="tag-list">
+                <li><a href="#">chromebook</a> <span class="tag-count">12</span></li>
+                <li><a href="#">html_code</a> <span class="tag-count">8</span></li>
+                <li><a href="#">dark_mode</a> <span class="tag-count">5</span></li>
+                <li><a href="#">github</a> <span class="tag-count">3</span></li>
+                <li><a href="#">web_admin</a> <span class="tag-count">1</span></li>
+            </ul>
+
+            <!-- Admin Control Box -->
+            <div class="admin-panel">
+                <span class="admin-badge">ADMIN CONTROL</span>
+                <p style="font-size: 11px; margin-bottom: 8px;">Logged in as: <strong>Dooley (Root)</strong></p>
+                <button class="btn" onclick="triggerUpload()">+ Upload Post</button>
+                <button class="btn" id="toggleAdminBtn" onclick="toggleAdminMode()" style="background: #444;">Enable Admin Edit</button>
+            </div>
+        </div>
+
+        <!-- Main Content Gallery -->
+        <div class="gallery">
+            <div class="post-card" id="post-1">
+                <img src="https://picsum.photos/300/300?random=1" alt="Sample 1">
+                <div class="post-info">Post #1001 • 1200x800</div>
+                <div class="admin-actions">
+                    <button class="btn btn-danger" onclick="deletePost('post-1')">Delete Post</button>
+                </div>
+            </div>
+
+            <div class="post-card" id="post-2">
+                <img src="https://picsum.photos/300/300?random=2" alt="Sample 2">
+                <div class="post-info">Post #1002 • 1920x1080</div>
+                <div class="admin-actions">
+                    <button class="btn btn-danger" onclick="deletePost('post-2')">Delete Post</button>
+                </div>
+            </div>
+
+            <div class="post-card" id="post-3">
+                <img src="https://picsum.photos/300/300?random=3" alt="Sample 3">
+                <div class="post-info">Post #1003 • 800x600</div>
+                <div class="admin-actions">
+                    <button class="btn btn-danger" onclick="deletePost('post-3')">Delete Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let adminMode = false;
+
+        function toggleAdminMode() {
+            adminMode = !adminMode;
+            const actions = document.querySelectorAll('.admin-actions');
+            const btn = document.getElementById('toggleAdminBtn');
+
+            actions.forEach(action => {
+                action.style.display = adminMode ? 'block' : 'none';
+            });
+
+            if (adminMode) {
+                btn.style.background = '#e74c3c';
+                btn.innerText = 'Disable Admin Edit';
+                alert('Admin Edit Mode Enabled! You can now moderate posts.');
+            } else {
+                btn.style.background = '#444';
+                btn.innerText = 'Enable Admin Edit';
+            }
+        }
+
+        function deletePost(id) {
+            if (confirm('Admin Action: Delete this post from the booru?')) {
+                document.getElementById(id).remove();
+            }
+        }
+
+        function triggerUpload() {
+            alert('Admin Console: Opening file uploader modal...');
+        }
+    </script>
 </body>
 </html>
